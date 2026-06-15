@@ -2,50 +2,115 @@ package proxy
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/binary"
 	"net"
 	"strconv"
 	"sync"
 	"time"
+
+	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
+	"golang.org/x/net/ipv6"
 )
 
-// ping returns the round-trip time to addr. A zero duration means the
-// target did not answer. It uses a TCP SYN to port 53 (DNS), which works
-// without raw sockets or CAP_NET_RAW in most containers and matches the
-// traffic pattern this app already uses.
+const (
+	icmpTimeout = 2 * time.Second
+	icmpPayload = "AzureDNSForwarder"
+)
+
+// ping returns the round-trip time to addr using an ICMP echo request. A zero
+// duration means the target did not answer (or ICMP is blocked). This uses the
+// unprivileged ICMP socket support available on Linux 2.6.30+ and does not
+// require raw sockets or CAP_NET_RAW.
 func ping(ctx context.Context, addr string) time.Duration {
 	ip := net.ParseIP(addr)
 	if ip == nil {
 		return 0
 	}
 
-	rtt, ok := tcpPing(ctx, net.JoinHostPort(addr, "53"))
-	if ok {
-		return rtt
+	var network string
+	var proto int
+	if ip.To4() != nil {
+		network = "ip4:icmp"
+		proto = ipv4.ICMPTypeEcho.Protocol()
+	} else {
+		network = "ip6:ipv6-icmp"
+		proto = ipv6.ICMPTypeEchoRequest.Protocol()
 	}
 
-	// Try the HTTPS port as a fallback for targets that may not run a DNS
-	// resolver directly (e.g. CDNs or HTTP load balancers).
-	rtt, ok = tcpPing(ctx, net.JoinHostPort(addr, "443"))
-	if ok {
-		return rtt
-	}
-	return 0
-}
-
-// tcpPing attempts a TCP connection to the supplied host:port and returns
-// the handshake RTT on success.
-func tcpPing(ctx context.Context, hostport string) (time.Duration, bool) {
-	start := time.Now()
-	d := net.Dialer{Timeout: 2 * time.Second}
-	conn, err := d.DialContext(ctx, "tcp", hostport)
+	c, err := icmp.ListenPacket(network, "")
 	if err != nil {
-		return 0, false
+		return 0
 	}
-	defer conn.Close()
-	return time.Since(start), true
+	defer c.Close()
+
+	id := randInt(1 << 16)
+	seq := randInt(1 << 16)
+	data := append([]byte(icmpPayload), uint16Bytes(id)...)
+	data = append(data, uint16Bytes(seq)...)
+
+	var typ icmp.Type
+	if ip.To4() != nil {
+		typ = ipv4.ICMPTypeEcho
+	} else {
+		typ = ipv6.ICMPTypeEchoRequest
+	}
+
+	m := &icmp.Message{
+		Type: typ,
+		Code: 0,
+		Body: &icmp.Echo{
+			ID:   id,
+			Seq:  seq,
+			Data: data,
+		},
+	}
+	wb, err := m.Marshal(nil)
+	if err != nil {
+		return 0
+	}
+
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(icmpTimeout)
+	}
+	_ = c.SetDeadline(deadline)
+
+	start := time.Now()
+	if _, err := c.WriteTo(wb, &net.IPAddr{IP: ip}); err != nil {
+		return 0
+	}
+
+	reply := make([]byte, 1500)
+	for {
+		n, peer, err := c.ReadFrom(reply)
+		if err != nil {
+			return 0
+		}
+		if peer.String() != addr {
+			continue
+		}
+		rtt := time.Since(start)
+
+		rm, err := icmp.ParseMessage(proto, reply[:n])
+		if err != nil {
+			continue
+		}
+		echo, ok := rm.Body.(*icmp.Echo)
+		if !ok {
+			continue
+		}
+		if echo.ID != id || echo.Seq != seq {
+			continue
+		}
+		return rtt
+	}
 }
 
 // concurrentPinger pings many addresses in parallel and returns the best RTT.
+// If every ping fails, best is 0 so callers can fall back to returning all
+// records unchanged.
 func concurrentPinger(ctx context.Context, addrs []string) (map[string]time.Duration, time.Duration) {
 	res := make(map[string]time.Duration, len(addrs))
 	var mu sync.Mutex
@@ -66,6 +131,9 @@ func concurrentPinger(ctx context.Context, addrs []string) (map[string]time.Dura
 		}(a)
 	}
 	wg.Wait()
+	if best < 0 {
+		best = 0
+	}
 	return res, best
 }
 
@@ -85,6 +153,21 @@ func parseUpstream(s string) (string, int, error) {
 	return host, port, nil
 }
 
+func randInt(max int) int {
+	b := make([]byte, 4)
+	if _, err := rand.Read(b); err != nil {
+		return int(time.Now().UnixNano()) % max
+	}
+	return int(binary.BigEndian.Uint32(b)) % max
+}
+
+func uint16Bytes(v int) []byte {
+	b := make([]byte, 2)
+	binary.BigEndian.PutUint16(b, uint16(v))
+	return b
+}
+
+// stringsContains reports whether s contains substr.
 func stringsContains(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || (len(s) > 0 && containsSubstr(s, substr)))
 }

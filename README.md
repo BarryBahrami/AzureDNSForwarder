@@ -310,7 +310,7 @@ The UI is reachable at `/` and provides these pages:
 
 1. Create or edit an **exact** forward zone, e.g. `a.rtmp.youtube.com`.
 2. Check **Least Latency Response**.
-3. Set the test frequency in minutes (rounded up to the nearest 5; default 5).
+3. Set the test frequency in minutes (default 5).
 4. Save. The internal proxy begins probing and returns the best-performing
    record(s).
 
@@ -432,19 +432,21 @@ lowest-latency answer instead of the full upstream response.
 1. Enable **Least Latency** on an exact forward zone.
 2. The internal proxy periodically resolves the zone name through the
    configured upstream(s).
-3. It measures latency to every IP in the answer by opening a TCP connection
-   to port `53` (falling back to `443`).
+3. Every `latency_test_frequency` minutes it sends an ICMP echo request (ping)
+   to each IP returned by the DNS lookup and records the round-trip time.
 4. It caches the best-performing record(s) — all targets tied for lowest RTT
    are returned.
-5. `unbound` is configured to forward matching queries to the proxy at
+5. If **all** pings fail (for example because ICMP is blocked), the proxy falls
+   back to returning the complete upstream answer, exactly like a regular
+   forward zone.
+6. `unbound` is configured to forward matching queries to the proxy at
    `127.0.0.1:15353`, so clients receive only the best targets.
 
 ### Configuration
 
 * Only available on **exact** zones (`wildcard: false`).
-* `latency_test_frequency` is stored and displayed in **minutes**. Values
-  smaller than 5 minutes are rounded up; values not divisible by 5 are rounded
-  up to the next 5-minute step.
+* `latency_test_frequency` is stored and displayed in **minutes**. Any positive
+  integer is accepted; the default is 5 minutes.
 * Each peer runs its own independent measurements, so different instances may
   return different "best" records.
 * The proxy is bound to loopback only and never accepts external traffic.

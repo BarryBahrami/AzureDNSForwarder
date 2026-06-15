@@ -274,10 +274,10 @@ func (f *File) Validate() error {
 				z.LatencyTestFrequency = 5
 			}
 			// LatencyTestFrequency is stored and displayed in minutes.
-			// The minimum practical test interval is 5 minutes; round up
-			// if the user supplies a smaller positive value.
-			if z.LatencyTestFrequency%5 != 0 {
-				z.LatencyTestFrequency = ((z.LatencyTestFrequency / 5) + 1) * 5
+			// Any positive integer is accepted; very low values are allowed
+			// but will probe the targets more often.
+			if z.LatencyTestFrequency < 1 {
+				z.LatencyTestFrequency = 1
 			}
 		}
 		for j, up := range z.Upstreams {

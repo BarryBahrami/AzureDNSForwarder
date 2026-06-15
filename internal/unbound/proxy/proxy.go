@@ -4,11 +4,12 @@
 //
 // When a forward zone has LeastLatency enabled, unbound is configured to
 // forward all matching queries to this proxy. The proxy periodically
-// resolves the zone name through the configured upstream(s), measures the
-// latency (via TCP handshake to port 53/443) to every address in the answer,
-// and caches the lowest-latency targets. When a real query arrives, the
-// proxy returns an answer containing only the best targets (all targets
-// tied at the lowest latency).
+// resolves the zone name through the configured upstream(s), sends an ICMP
+// echo request (ping) to every address in the answer, and caches the
+// lowest-latency targets. When a real query arrives, the proxy returns an
+// answer containing only the best targets (all targets tied at the lowest
+// latency). If every ping fails, the proxy falls back to returning the full
+// upstream answer, exactly like a regular forward zone.
 //
 // Sync partners receive the zone configuration (including the LeastLatency
 // flag and test frequency) but each peer runs its own independent latency

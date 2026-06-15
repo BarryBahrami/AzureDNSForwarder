@@ -9,7 +9,7 @@
   <label class="check"><input type="checkbox" name="send_to_gcp" value="1"> Send to GCP DNS</label>
   <input name="upstreams" placeholder="10.0.0.4, 10.0.0.5">
   <label class="check" id="ll-label" style="opacity:0.4" title="Only available for exact (non-wildcard) names"><input type="checkbox" id="ll-check" name="least_latency" value="1" disabled> Least Latency Response</label>
-  <label id="ll-freq-label" style="opacity:0.4" title="Test frequency in minutes (5-minute steps)">Test freq <input name="latency_test_frequency" id="ll-freq" type="number" min="5" step="5" value="5" style="width:90px"></label>
+  <label id="ll-freq-label" style="opacity:0.4" title="Test frequency in minutes">Test freq <input name="latency_test_frequency" id="ll-freq" type="number" min="1" step="1" value="5" style="width:90px"></label>
   <label class="check"><input type="checkbox" name="do_not_sync" value="1"> Do not sync with peers</label>
   <input name="sync_peers" placeholder="peer names (default: all)">
   <button type="submit">Add</button>
