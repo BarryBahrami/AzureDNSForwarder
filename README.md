@@ -8,6 +8,8 @@ or branch-office networks.  It has since been greatly expanded, to include forwa
 
 Although the examples in this project put two DNS servers on a single host, I do not recommend this in production.  Instead, run two instances on separate hosts, and use the **Sync Partners** feature to keep them in sync.
 
+This update is a work in progress.  Although I have tested much, there may be bugs.  Please report them.
+
 
 
 * **Engine:** [unbound](https://www.nlnetlabs.nl/projects/unbound/about/)
@@ -107,6 +109,7 @@ mkdir -p .shared-config
 docker run --rm -d --name dnsfwd \
   -p 53:53/udp -p 53:53/tcp -p 8080:80 \
   --cap-add=NET_BIND_SERVICE \
+  --cap-add=NET_RAW \
   -v $PWD/.shared-config:/config \
   azure-dns-forwarder:local
 ```
@@ -118,6 +121,7 @@ mkdir -p .shared-config
 docker run --rm -d --name dnsfwd \
   -p 53:53/udp -p 53:53/tcp -p 8080:80 \
   --cap-add=NET_BIND_SERVICE \
+  --cap-add=NET_RAW \
   -v $PWD/.shared-config:/config \
   barrybahrami/azurednsforwarder
 ```
@@ -137,6 +141,7 @@ docker run --rm -d --name dnsfwd \
   -p 8080:80 \
   -p 8443:8443 \
   --cap-add=NET_BIND_SERVICE \
+  --cap-add=NET_RAW \
   -v $PWD/.my-config:/config \
   -e DNSFWD_INSTANCE=dnsfwd-site-a \
   -e PEER_LISTEN=0.0.0.0:8443 \
@@ -376,6 +381,7 @@ services:
       - PEERS_INITIAL=https://10.2.1.4:8443,https://10.3.1.4:8443
     cap_add:
       - NET_BIND_SERVICE
+      - NET_RAW
 ```
 
 Or use Docker/k8s secrets:
@@ -535,9 +541,10 @@ The peer API runs on `peers.listen` (default `8443`). All requests must use
 * **No built-in UI authentication.** The admin UI binds to all interfaces
   by default. Place it behind an NSG, a private VNet, or a reverse proxy with
   authentication.
-* The container runs as the unprivileged `dnsfwd` user and needs
-  `NET_BIND_SERVICE` to bind port `53`. The Dockerfile also adds
-  `SETUID`/`SETGID` so unbound can drop privileges correctly.
+* The container runs as the unprivileged `dnsfwd` user. It needs
+  `NET_BIND_SERVICE` to bind port `53` and `NET_RAW` to send ICMP echo
+  requests for least-latency probes. The Dockerfile also adds `SETUID`/
+  `SETGID` so unbound can drop privileges correctly.
 * **Peer PSK protection:** the shared key is redacted in API responses and in
   the default export. Use `?secrets=1` only when you need to back it up; treat
   that export as confidential.
@@ -576,7 +583,9 @@ The peer API runs on `peers.listen` (default `8443`). All requests must use
 | UI footer shows a red error | `/api/healthz` and `/api/status` return the last reload error; verify the YAML with `unbound-checkconf`. |
 | Peer sync not happening | Verify `peers.shared_key` matches, `peers.list[].enabled` is true, URLs use `https://`, and clocks are within `clock_skew_seconds`. |
 | Least-latency zone returns SERVFAIL | Check that the zone is exact (non-wildcard) and that the proxy has completed at least one probe (`/api/status`). |
+| Least-latency zone returns all upstream records | ICMP is likely blocked or `NET_RAW` is missing. The proxy intentionally falls back to the full answer when pings fail. |
 | Container cannot bind port 53 | Add `--cap-add=NET_BIND_SERVICE`. On rootless Docker you may also need a privileged port mapping. |
+| Least-latency probes fail with "operation not permitted" | Add `--cap-add=NET_RAW` so the container can send ICMP echo requests. |
 | DNS replies not reaching clients | Ensure unbound `access-control` allows the client network (the container already allows `0.0.0.0/0` and `::/0`). |
 
 ---

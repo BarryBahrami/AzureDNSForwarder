@@ -305,7 +305,11 @@ func (s *Server) probeZone(ctx context.Context, z *zoneState) {
 	z.Updated = time.Now().UTC()
 	s.mu.Unlock()
 
-	s.logger.Debug("latency probe done", "zone", z.Name, "records", len(records), "best_ms", bestRTT.Milliseconds())
+	if keepAll {
+		s.logger.Info("latency probe done", "zone", z.Name, "records", len(records), "best_ms", bestRTT.Milliseconds(), "fallback", "all pings failed")
+	} else {
+		s.logger.Info("latency probe done", "zone", z.Name, "records", len(records), "best_ms", bestRTT.Milliseconds())
+	}
 }
 
 // resolveTarget asks the configured upstream for the zone name and returns

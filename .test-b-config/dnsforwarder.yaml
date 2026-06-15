@@ -1,6 +1,6 @@
 version: 1
-updated: 2026-06-15T05:27:03.994959793Z
-updated_by: peer:test-a-8443
+updated: 2026-06-15T06:00:19.38922085Z
+updated_by: peer:test-a
 settings:
     cache_size: 1000
     dnssec: false
@@ -28,12 +28,12 @@ upstream_defaults:
       deleted: true
     - address: 8.8.8.8
       port: 53
-      enabled: true
+      enabled: false
       note: google a
       do_not_sync: false
-      updated_at: 2026-06-15T04:34:16.524726575Z
+      updated_at: 2026-06-15T05:59:36.244271413Z
       updated_by: api
-      deleted: false
+      deleted: true
     - address: 8.8.4.4
       port: 53
       enabled: true
@@ -63,7 +63,31 @@ forward_zones:
       least_latency: true
       latency_test_frequency: 5
       do_not_sync: false
-      updated_at: 2026-06-15T04:34:56.851291245Z
+      updated_at: 2026-06-15T05:59:23.340508578Z
+      updated_by: kilo-test
+      deleted: true
+    - id: b7acf837dba3e5b5
+      name: a.rtmp.youtube.com
+      wildcard: false
+      upstreams:
+        - 8.8.8.8
+        - 8.8.4.4
+      least_latency: true
+      latency_test_frequency: 1
+      do_not_sync: false
+      updated_at: 2026-06-15T06:00:02.623676859Z
+      updated_by: api
+      deleted: true
+    - id: c49d8244ca33bb3a
+      name: a.rtmp.youtube.com
+      wildcard: false
+      upstreams:
+        - 8.8.8.8
+        - 8.8.4.4
+      least_latency: true
+      latency_test_frequency: 5
+      do_not_sync: false
+      updated_at: 2026-06-15T06:00:19.384609142Z
       updated_by: api
       deleted: false
 static_records: []

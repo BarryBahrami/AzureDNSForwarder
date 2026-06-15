@@ -1,6 +1,6 @@
 version: 1
-updated: 2026-06-15T05:27:04.007515326Z
-updated_by: peer:test-b
+updated: 2026-06-15T06:00:19.38460875Z
+updated_by: api
 settings:
     cache_size: 1000
     dnssec: false
@@ -18,14 +18,6 @@ peers:
           url: https://test-b:8443
           enabled: true
 upstream_defaults:
-    - address: 8.8.8.8
-      port: 53
-      enabled: true
-      note: google a
-      do_not_sync: false
-      updated_at: 2026-06-15T04:34:16.524726575Z
-      updated_by: api
-      deleted: false
     - address: 8.8.4.4
       port: 53
       enabled: true
@@ -35,7 +27,7 @@ upstream_defaults:
       updated_by: api
       deleted: false
 forward_zones:
-    - id: e055ea9496b05f16
+    - id: c49d8244ca33bb3a
       name: a.rtmp.youtube.com
       wildcard: false
       upstreams:
@@ -44,7 +36,7 @@ forward_zones:
       least_latency: true
       latency_test_frequency: 5
       do_not_sync: false
-      updated_at: 2026-06-15T04:34:56.851291245Z
+      updated_at: 2026-06-15T06:00:19.384609142Z
       updated_by: api
       deleted: false
 static_records: []
