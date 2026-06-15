@@ -603,4 +603,18 @@ Features intentionally not implemented yet:
 
 ---
 
-Built by Barry Bahrami — <https://CloudInteriors.net>
+Built by Barry Bahrami — https://CloudInteriors.net
+
+Released under GNU
+
+Feel free to reach out with any questions.
+
+LinkedIn: https://www.linkedin.com/in/barrybahrami/ Email: BarryBahrami at gmail
+
+If this helped you then please consider donating to the San Diego Web Cam.
+
+Bitcoin: bc1q0a5sf8q0j90qedndrmvgulv0rwxlfhc8rgk8c9
+
+And watch on YouTube! SunDiegoLive.com
+
+Thank you

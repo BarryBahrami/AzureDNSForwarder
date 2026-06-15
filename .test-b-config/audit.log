@@ -17,3 +17,8 @@
 {"time":"2026-06-15T06:00:03.168765225Z","actor":"peer:test-a","action":"peer-push-applied","details":"rejected=1"}
 {"time":"2026-06-15T06:00:19.60788071Z","actor":"test-b","action":"config-applied","details":"api-save"}
 {"time":"2026-06-15T06:00:19.608041525Z","actor":"peer:test-a","action":"peer-push-applied","details":"added=1 rejected=1"}
+{"time":"2026-06-15T06:04:30.832660587Z","actor":"self","action":"peer-push-sent","details":"test-a-8443 skipped=3 rejected=4"}
+{"time":"2026-06-15T06:04:31.057739841Z","actor":"test-b","action":"config-applied","details":"api-save"}
+{"time":"2026-06-15T06:04:31.057937444Z","actor":"peer:test-a","action":"peer-pull-applied","details":"test-a-8443"}
+{"time":"2026-06-15T06:04:32.665034819Z","actor":"test-b","action":"config-applied","details":"api-save"}
+{"time":"2026-06-15T06:04:32.665170822Z","actor":"peer:test-a","action":"peer-push-applied","details":"skipped=1 rejected=1"}

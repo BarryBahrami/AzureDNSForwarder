@@ -25,3 +25,8 @@
 {"time":"2026-06-15T06:00:19.828691066Z","actor":"test-a","action":"config-applied","details":"api-save"}
 {"time":"2026-06-15T06:00:19.828940763Z","actor":"api","action":"forwarder-add","details":"a.rtmp.youtube.com"}
 {"time":"2026-06-15T06:00:20.358098955Z","actor":"test-a","action":"config-applied","details":"api-save"}
+{"time":"2026-06-15T06:04:30.831355828Z","actor":"test-a","action":"config-applied","details":"api-save"}
+{"time":"2026-06-15T06:04:30.831654561Z","actor":"peer:test-b","action":"peer-push-applied","details":"skipped=3 rejected=4"}
+{"time":"2026-06-15T06:04:32.665868794Z","actor":"self","action":"peer-push-sent","details":"test-b-8443 skipped=1 rejected=1"}
+{"time":"2026-06-15T06:04:32.884698467Z","actor":"test-a","action":"config-applied","details":"api-save"}
+{"time":"2026-06-15T06:04:32.884988948Z","actor":"peer:test-b","action":"peer-pull-applied","details":"test-b-8443"}
