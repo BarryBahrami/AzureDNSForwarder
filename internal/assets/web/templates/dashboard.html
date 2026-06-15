@@ -1,0 +1,36 @@
+{{define "content"}}
+<h1>Dashboard</h1>
+<section class="cards">
+  <div class="card">
+    <h3>Status</h3>
+    {{if .Status.LastErr}}<p class="err">⚠ {{.Status.LastErr}}</p>{{else}}<p class="ok">● healthy</p>{{end}}
+    <p class="muted">Last apply: {{if .Status.LastOK}}{{.Status.LastOK.Format "2006-01-02 15:04:05 MST"}}{{else}}never{{end}}</p>
+    <p class="muted">Config hash: <code>{{slice .Status.Hash 0 12}}…</code></p>
+  </div>
+  <div class="card">
+    <h3>Instance</h3>
+    <p><strong>{{.Instance}}</strong></p>
+  </div>
+  <div class="card">
+    <h3>Counts</h3>
+    <p>Default upstreams: {{len .Config.UpstreamDefaults}}</p>
+    <p>Forward zones: {{len .Config.ForwardZones}}</p>
+    <p>Static records: {{len .Config.StaticRecords}}</p>
+  </div>
+</section>
+
+<h2>Test resolution</h2>
+<form id="test-form">
+  <label>Name <input name="name" placeholder="db.corp.local" required></label>
+  <label>Type
+    <select name="qtype">
+      <option>A</option><option>AAAA</option><option>CNAME</option>
+      <option>MX</option><option>TXT</option><option>NS</option><option>SOA</option>
+    </select>
+  </label>
+  <label>Upstream <input name="upstream" placeholder="(default)"></label>
+  <button type="submit">Resolve</button>
+</form>
+<pre id="test-result" class="result"></pre>
+{{end}}
+{{template "base.html" .}}

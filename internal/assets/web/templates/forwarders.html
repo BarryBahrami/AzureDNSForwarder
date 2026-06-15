@@ -1,0 +1,43 @@
+{{define "content"}}
+<h1>Forwarders</h1>
+<p class="muted">Exact or wildcard forward zones. Prefix a name with <code>*. </code>(for example, <code>*.corp.local</code>) to make it a wildcard that matches the zone and every subdomain. Server list is tried in order.</p>
+
+<form id="add-form" class="row">
+  <input name="name" id="fwd-name" placeholder="*.corp.local or contoso.com" required>
+  <label class="check"><input type="checkbox" name="send_to_azure" value="1"> Send to Azure DNS</label>
+  <label class="check"><input type="checkbox" name="send_to_aws" value="1"> Send to AWS DNS</label>
+  <label class="check"><input type="checkbox" name="send_to_gcp" value="1"> Send to GCP DNS</label>
+  <input name="upstreams" placeholder="10.0.0.4, 10.0.0.5">
+  <label class="check" id="ll-label" style="opacity:0.4" title="Only available for exact (non-wildcard) names"><input type="checkbox" id="ll-check" name="least_latency" value="1" disabled> Least Latency Response</label>
+  <label id="ll-freq-label" style="opacity:0.4" title="Test frequency in minutes (5-minute steps)">Test freq <input name="latency_test_frequency" id="ll-freq" type="number" min="5" step="5" value="5" style="width:90px"></label>
+  <label class="check"><input type="checkbox" name="do_not_sync" value="1"> Do not sync with peers</label>
+  <input name="sync_peers" placeholder="peer names (default: all)">
+  <button type="submit">Add</button>
+</form>
+<p class="muted">Check "Send to Azure DNS" to forward this zone to <code>168.63.129.16</code>, "Send to AWS DNS" to forward to <code>169.254.169.253</code>, or "Send to GCP DNS" to forward to <code>169.254.169.254</code>. The upstreams field will be ignored when a cloud DNS checkbox is selected. Otherwise enter one or more comma-separated nameserver IPs. "Least Latency Response" is only available for exact (non-wildcard) names; when checked the system periodically pings every returned record and answers with the lowest-latency targets. "Do not sync" keeps the zone local; leave unchecked and set peer names to sync only to specific partners.</p>
+
+<table id="zones">
+  <thead><tr><th>Name</th><th>Wildcard</th><th>Upstreams</th><th>Latency</th><th>Sync</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+
+<h2>Default upstreams (catch-all)</h2>
+<p class="muted">These receive any query not matched by a forward zone above. Toggle each upstream on or off; you can also remove the Azure DNS upstream entirely if you only want specific zones to forward.</p>
+<form id="defaults-form" class="row">
+  <label class="check"><input type="checkbox" name="use_azure" value="1"> Use Azure DNS</label>
+  <label class="check"><input type="checkbox" name="use_aws" value="1"> Use AWS DNS</label>
+  <label class="check"><input type="checkbox" name="use_gcp" value="1"> Use GCP DNS</label>
+  <input name="address" placeholder="e.g. 8.8.8.8">
+  <input name="port" type="number" placeholder="53" value="53">
+  <input name="note" placeholder="label (optional)">
+  <label class="check"><input type="checkbox" name="do_not_sync" value="1"> Do not sync with peers</label>
+  <input name="sync_peers" placeholder="peer names (default: all)">
+  <button type="submit">Add</button>
+</form>
+<p class="muted">Check "Use Azure DNS" to add <code>168.63.129.16</code>, "Use AWS DNS" to add <code>169.254.169.253</code>, or "Use GCP DNS" to add <code>169.254.169.254</code> as your catch-all. The address and port fields will be ignored when a cloud DNS checkbox is selected. "Do not sync" keeps the upstream local; leave unchecked and set peer names to sync only to specific partners.</p>
+<table id="defaults">
+  <thead><tr><th>On</th><th>Address</th><th>Port</th><th>Note</th><th>Sync</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+{{end}}
+{{template "base.html" .}}

@@ -1,0 +1,65 @@
+:root {
+  --bg: #0f1216;
+  --panel: #161b22;
+  --panel2: #1c2330;
+  --border: #2a313c;
+  --fg: #d6dde6;
+  --muted: #8b95a4;
+  --accent: #4ea1ff;
+  --ok: #3fb950;
+  --err: #f85149;
+  --warn: #d29922;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: var(--panel); border-bottom: 1px solid var(--border); }
+header .brand { font-weight: 600; }
+header .instance { color: var(--muted); font-family: ui-monospace, "SF Mono", monospace; }
+nav { display: flex; gap: 4px; padding: 6px 14px; background: var(--panel); border-bottom: 1px solid var(--border); }
+nav a { color: var(--fg); text-decoration: none; padding: 6px 10px; border-radius: 6px; }
+nav a:hover { background: var(--panel2); }
+nav a.active { background: var(--panel2); color: var(--accent); }
+main { padding: 18px; max-width: 1100px; }
+footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; color: var(--muted); border-top: 1px solid var(--border); font-size: 12px; }
+footer .copy { color: var(--muted); text-decoration: none; }
+footer .copy:hover { color: var(--accent); }
+h1 { margin-top: 0; }
+h2 { margin-top: 28px; }
+.muted { color: var(--muted); }
+.ok { color: var(--ok); }
+.err { color: var(--err); }
+code { font-family: ui-monospace, "SF Mono", monospace; background: var(--panel2); padding: 1px 4px; border-radius: 4px; }
+pre { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow: auto; }
+pre.result { min-height: 60px; white-space: pre-wrap; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.card h3 { margin: 0 0 6px 0; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.card p { margin: 4px 0; }
+
+form { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 12px 0; }
+form.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+form.col { display: flex; flex-direction: column; gap: 8px; }
+form label { display: flex; gap: 6px; align-items: center; }
+form label.check { display: inline-flex; }
+form input, form select { background: var(--panel2); color: var(--fg); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; }
+form input[type=number] { width: 110px; }
+form button, .btn { background: var(--accent); color: #001427; border: 0; border-radius: 6px; padding: 7px 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+form button:hover { filter: brightness(1.1); }
+.btn { background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
+
+table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--panel2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+.sync-edit { display: inline-flex; gap: 4px; align-items: center; }
+.sync-edit input { width: 180px; padding: 4px 6px; font-size: 12px; }
+.sync-edit button { padding: 4px 8px; font-size: 12px; }
+tr:last-child td { border-bottom: 0; }
+td button { background: transparent; color: var(--err); border: 0; cursor: pointer; }
+td button:hover { text-decoration: underline; }
+
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.badge.ok { background: rgba(63, 185, 80, 0.15); color: var(--ok); }
+.badge.warn { background: rgba(210, 153, 34, 0.15); color: var(--warn); }
+.badge.err { background: rgba(248, 81, 73, 0.15); color: var(--err); }
+.badge.disabled { background: var(--panel2); color: var(--muted); }

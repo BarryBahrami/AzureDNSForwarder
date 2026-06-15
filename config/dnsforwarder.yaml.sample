@@ -1,0 +1,16 @@
+version: 1
+updated: 2026-01-01T00:00:00Z
+updated_by: bootstrap
+settings:
+  cache_size: 1000
+  dnssec: false
+  log_queries: false
+  http_listen: 0.0.0.0:80
+  dns_listen: 0.0.0.0:53
+  poll_seconds: 10
+upstream_defaults:
+  - address: 168.63.129.16
+    port: 53
+    # sync_peers: ["peer-a", "peer-b"]  # default: sync to all peers
+forward_zones: []
+static_records: []

@@ -1,0 +1,49 @@
+{{define "content"}}
+<h1>Synchronized Peers</h1>
+<p class="muted">Other <code>dnsforwarderd</code> instances we exchange selected configuration with. Sync is one-way per item: last writer wins, audited. Use a WireGuard sidecar (or any private network) and the same preshared key on every peer.</p>
+
+<section class="cards">
+  <div class="card">
+    <h3>Listen address</h3>
+    <p><code>{{.Config.Peers.Listen}}</code></p>
+    <p class="muted">Where this instance accepts peer connections. Set in YAML or <code>PEER_LISTEN</code>.</p>
+  </div>
+  <div class="card">
+    <h3>Sync interval</h3>
+    <p>{{.Config.Peers.SyncIntervalSeconds}}s</p>
+    <p class="muted">How often this instance pulls from each peer.</p>
+  </div>
+  <div class="card">
+    <h3>Preshared key</h3>
+    {{if gt (len .Config.Peers.SharedKey) 0}}
+      <p><code>••••••••</code> <span class="muted">({{len .Config.Peers.SharedKey}} chars)</span></p>
+    {{else}}
+      <p class="err">not set</p>
+    {{end}}
+    <p class="muted">Set in YAML as <code>peers.shared_key</code>, or via <code>PEER_SHARED_KEY</code> / <code>PEER_SHARED_KEY_FILE</code>. Every peer must use the same value.</p>
+  </div>
+</section>
+
+<h2>Configured peers</h2>
+<p class="muted">All configured peers are shown. Disabled peers are kept but ignored until re-enabled.</p>
+<table id="peers">
+  <thead><tr>
+    <th>Name</th><th>URL</th><th>Status</th>
+    <th>Last contact</th><th>Last seq</th><th>Last action</th>
+    <th>Last error</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+
+<h2>Add peer</h2>
+<form id="add-form" class="row">
+  <input name="name" placeholder="name (optional, auto from URL)">
+  <input name="url" placeholder="https://peer.example:8443" required>
+  <label class="check"><input type="checkbox" name="enabled" value="1" checked> enabled</label>
+  <button type="submit">Add</button>
+</form>
+<p class="muted">For VM-to-VM redundancy, point each instance at the other. Recommended: pair this with a WireGuard sidecar and bind <code>PEER_LISTEN</code> to the WG interface only.</p>
+
+<script src="/static/sync_partners.js"></script>
+{{end}}
+{{template "base.html" .}}

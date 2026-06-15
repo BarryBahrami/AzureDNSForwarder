@@ -1,0 +1,74 @@
+services:
+  test-a:
+    image: azure-dns-forwarder:local
+    container_name: test-a
+    hostname: test-a
+    restart: unless-stopped
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETUID
+      - SETGID
+    ports:
+      - "15353:53/udp"
+      - "15353:53/tcp"
+      - "8081:80"
+    volumes:
+      - test-a-config:/config
+    environment:
+      - DNSFWD_INSTANCE=test-a
+      - PEER_LISTEN=0.0.0.0:8443
+      - PEER_SHARED_KEY=test-sync-secret-key
+      - PEERS_INITIAL=https://test-b:8443
+    networks:
+      - sync-test
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/api/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  test-b:
+    image: azure-dns-forwarder:local
+    container_name: test-b
+    hostname: test-b
+    restart: unless-stopped
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETUID
+      - SETGID
+    ports:
+      - "25353:53/udp"
+      - "25353:53/tcp"
+      - "8082:80"
+    volumes:
+      - test-b-config:/config
+    environment:
+      - DNSFWD_INSTANCE=test-b
+      - PEER_LISTEN=0.0.0.0:8443
+      - PEER_SHARED_KEY=test-sync-secret-key
+      - PEERS_INITIAL=https://test-a:8443
+    networks:
+      - sync-test
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/api/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  test-a-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/.test-a-config
+  test-b-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/.test-b-config
+
+networks:
+  sync-test:
+    driver: bridge

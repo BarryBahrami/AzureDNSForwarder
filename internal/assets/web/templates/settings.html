@@ -1,0 +1,22 @@
+{{define "content"}}
+<h1>Settings</h1>
+<form id="settings-form" class="col">
+  <label>Cache size (entries)
+    <input name="cache_size" type="number" value="{{.Config.Settings.CacheSize}}">
+  </label>
+  <label class="check"><input type="checkbox" name="dnssec" value="1" {{if .Config.Settings.DNSSEC}}checked{{end}}> Enable DNSSEC validation</label>
+  <label class="check"><input type="checkbox" name="log_queries" value="1" {{if .Config.Settings.LogQueries}}checked{{end}}> Verbose query logging</label>
+  <label>DNS listen address
+    <input name="dns_listen" value="{{.Config.Settings.DNSListen}}">
+  </label>
+  <label>HTTP listen address
+    <input name="http_listen" value="{{.Config.Settings.HTTPListen}}">
+  </label>
+  <label>Poll interval (seconds)
+    <input name="poll_seconds" type="number" value="{{.Config.Settings.PollSeconds}}">
+  </label>
+  <button type="submit">Save</button>
+</form>
+<p class="muted">Note: HTTP listen changes take effect on container restart. DNS listen and poll interval reload live.</p>
+{{end}}
+{{template "base.html" .}}

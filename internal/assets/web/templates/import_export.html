@@ -1,0 +1,24 @@
+{{define "content"}}
+<h1>Import / Export</h1>
+<p>All instances of this forwarder read the same shared config file, so exporting from one and importing into another is rarely needed &mdash; but it's available as an escape hatch and for version control.</p>
+<p>
+  <a class="btn" href="/api/export">Download YAML (redacted)</a>
+  <a class="btn" href="#" id="export-secrets">Download YAML (includes peer preshared key &mdash; sensitive)</a>
+</p>
+<p class="muted">The redacted export is safe to commit to source control. The "includes secrets" variant contains the peer preshared key and must be treated as confidential.</p>
+
+<h2>Import</h2>
+<p class="muted">Replaces the current configuration. The import is validated and atomic; if the new file fails validation, the existing config is kept.</p>
+<form id="import-form" enctype="multipart/form-data" method="post" action="/api/import">
+  <input type="file" name="file" accept=".yaml,.yml" required>
+  <button type="submit">Upload &amp; replace</button>
+</form>
+<script>
+document.getElementById('export-secrets').addEventListener('click', function (e) {
+  e.preventDefault();
+  if (!confirm('This export will include the peer preshared key in clear text. Treat the resulting file as confidential. Continue?')) return;
+  window.location.href = '/api/export?secrets=1';
+});
+</script>
+{{end}}
+{{template "base.html" .}}

@@ -1,0 +1,35 @@
+{{define "base.html"}}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{.Title}} · Azure DNS Forwarder</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header>
+  <div class="brand">Azure DNS Forwarder</div>
+  <div class="instance" title="instance id">⛁ {{.Instance}}</div>
+</header>
+<nav>
+  <a href="/" class="{{if eq .Active "dashboard"}}active{{end}}">Dashboard</a>
+  <a href="/forwarders" class="{{if eq .Active "forwarders"}}active{{end}}">Forwarders</a>
+  <a href="/records" class="{{if eq .Active "records"}}active{{end}}">Static Records</a>
+  <a href="/settings" class="{{if eq .Active "settings"}}active{{end}}">Settings</a>
+  <a href="/sync-partners" class="{{if eq .Active "sync"}}active{{end}}">Sync Partners</a>
+  <a href="/import-export" class="{{if eq .Active "import"}}active{{end}}">Import / Export</a>
+  <a href="/audit" class="{{if eq .Active "audit"}}active{{end}}">Audit</a>
+</nav>
+<main>
+{{block "content" .}}{{end}}
+</main>
+<footer>
+  <span id="status-line">v{{.Status.Version}} · {{if .Status.LastErr}}<span class="err">⚠ {{.Status.LastErr}}</span>{{else}}<span class="ok">● healthy</span>{{end}}</span>
+  <span class="copy">
+    © 2026 <a href="https://www.linkedin.com/in/barrybahrami/" target="_blank" rel="noopener">Barry Bahrami</a>. Licensed under GPLv3.<br>
+    This software is free and <a href="https://github.com/BarryBahrami/AzureDNSForwarder" target="_blank" rel="noopener">open-source</a>. <a href="https://www.gnu.org/licenses/gpl-3.0.html#license-text" target="_blank" rel="noopener">[View License]</a>
+  </span>
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>
+{{end}}

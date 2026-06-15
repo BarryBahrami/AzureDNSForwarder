@@ -1,0 +1,65 @@
+services:
+  dnsfwd-1:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: azure-dns-forwarder:local
+    container_name: dnsfwd-1
+    restart: unless-stopped
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETUID
+      - SETGID
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "8081:80"
+    volumes:
+      - dnsfwd-shared:/config
+    environment:
+      - DNSFWD_INSTANCE=dnsfwd-1
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/api/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  dnsfwd-2:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: azure-dns-forwarder:local
+    container_name: dnsfwd-2
+    restart: unless-stopped
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETUID
+      - SETGID
+    # On a real host you wouldn't publish 53 twice. The second instance is
+    # for HA: clients use dnsfwd-1 as primary and dnsfwd-2 as secondary,
+    # both resolving the same shared config. For local testing we publish
+    # the secondary on 8053 so the host port doesn't clash.
+    ports:
+      - "8053:53/udp"
+      - "8053:53/tcp"
+      - "8082:80"
+    volumes:
+      - dnsfwd-shared:/config
+    environment:
+      - DNSFWD_INSTANCE=dnsfwd-2
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/api/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  # For local dev: a host bind mount under ./.shared-config/ so two
+  # compose-managed containers share the file.
+  # For Azure: replace with an Azure Files NFS mount or ReadWriteMany PVC.
+  dnsfwd-shared:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/.shared-config
