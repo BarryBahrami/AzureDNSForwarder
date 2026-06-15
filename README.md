@@ -613,7 +613,7 @@ LinkedIn: https://www.linkedin.com/in/barrybahrami/ Email: BarryBahrami at gmail
 
 If this helped you then please consider donating to the San Diego Web Cam.
 
-Bitcoin: bc1q0a5sf8q0j90qedndrmvgulv0rwxlfhc8rgk8c9
+Bitcoin: bc1q8uc0m6gjc3a0uesavuk7fl79m3hr4kfkk3vdza
 
 And watch on YouTube! SunDiegoLive.com
 
